@@ -1,0 +1,129 @@
+{% extends "main.html" %}
+{% block content %}
+
+<div class="flash col-md-12">
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul>
+        {% for category, message in messages %}
+        <li class="alert alert-{{ category }} alert-dismissable">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>{{ message }}</strong>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endwith %}
+</div>
+
+<div class="col-md-3" style="height: 100%">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>
+        <a href="{{ url_for('showCatalog') }}">Category</a>
+        <div class="pull-right">
+          <a href = "{{ url_for('newCategory') }}">
+            <button class="btn btn-success primary">
+              New Item
+            </button>
+          </a>
+        </div>
+      </h2>
+    </div>
+  </div>
+  <ul class="list-group">
+  	<li class="list-group-item"><a href="{{ url_for('showCatalog') }}">Latest Items</a></li>
+    {% for c in categories %}
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col-md-12">
+            <a href="{{ url_for('showCategoryItems', category_id=c.id) }}">{{ c.name }}</a>
+            {% if c.user_id == session.user_id %}
+            <div class="pull-right">
+              <a href="{{ url_for('editCategory', category_id=c.id, catalog_item_id=c.id) }}">
+                <button class="btn btn-default edit">
+                  Edit
+                </button>
+              </a>
+              <a href="{{ url_for('deleteCategory', category_id=c.id, catalog_item_id=c.id) }}">
+                <button class="btn btn-danger delete">
+                  Delete
+                </button>
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="col-md-9">
+	<div class="row">
+		<div class="col-md-12">
+			{% if quantity != 1 %}
+			<h2>{{ category.name }} Items ({{ quantity }} items)
+			{% else %}
+			<h2>{{ category.name }} Items ({{ quantity }} item)
+			{% endif %}
+			{% if session.user_id %}
+			<div class="pull-right">
+				<a href = "{{ url_for('newCatalogItem') }}">
+					<button class="btn btn-success primary">
+							New Item
+					</button>
+				</a>
+			</div>
+			{% endif %}
+			</h2>
+		</div>
+	</div>
+
+	<ul class="list-group">
+	{% if items and quantity > 0 %}
+	    {% for i in items %}
+	    <li class="list-group-item">
+			<div class="row">
+				<div class="col-md-12">
+				<!-- <img class="img-thumbnail pull-left" src="http://placehold.it/150" alt="image placeholder" /> -->
+					<span class="name">
+						<a href="{{ url_for('showCatalogItem', category_id=i.category_id, catalog_item_id=i.id) }}" >
+							<h3>{{i.name}}</a><br><small>({{ i.category.name }})</small>
+							{% if i.user_id == session.user_id %}
+							<div class="editdeletepane pull-right">
+								<a href="{{ url_for('editCatalogItem', category_id=i.category_id, catalog_item_id=i.id) }}">
+									<button class="btn btn-default edit">
+											Edit
+									</button>
+								</a>
+								<a href="{{ url_for('deleteCatalogItem', category_id=i.category_id, catalog_item_id=i.id) }}">
+									<button class="btn btn-danger delete">
+											Delete
+									</button>
+								</a>
+							</div>
+							{% endif %}
+						</h3>
+					</span>
+					{% if creator %}
+					<div>
+						Created By:  {{ creator.email }}
+					{% endif %}
+				</div>
+			</div>
+	    </li>
+	    {% endfor %}
+	{% else %}
+	<ul>
+	    <li class="list-group-item">
+	        You currently have no menu items.
+	    </li>
+	</ul>
+	{% endif %}
+</ul>
+
+
+</div>
+
+{% endblock %}
